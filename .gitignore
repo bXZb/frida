@@ -1,0 +1,21 @@
+# Gradle
+.gradle
+build
+.kotlin
+
+# Android / NDK
+local.properties
+.cxx
+.externalNativeBuild
+
+# Module build output
+out
+
+# WebUI sources are tracked; dependencies and build output are not
+webui/node_modules
+template/magisk_module/webroot
+
+# IDE
+.idea
+*.iml
+.DS_Store

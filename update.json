@@ -1,0 +1,6 @@
+{
+    "version": "v1.9.32",
+    "versionCode": 42,
+    "zipUrl": "https://github.com/bXZb/frida/releases/download/v1.9.32/KsuFrida-v1.9.32.zip",
+    "changelog": "https://raw.githubusercontent.com/bXZb/frida/main/changelog.md"
+}
