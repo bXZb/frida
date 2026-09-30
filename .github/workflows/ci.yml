@@ -43,8 +43,8 @@ jobs:
       - name: Get Module Info
         id: module-version
         run: |
-          MODULE_VERSION=$(grep '^moduleVersion=' gradle.properties | cut -d= -f2)
-          MODULE_VERSION_CODE=$(grep '^moduleVersionCode=' gradle.properties | cut -d= -f2)
+          MODULE_VERSION=$(sed -n 's/^val moduleVersion = "\(.*\)"$/\1/p' module/build.gradle.kts)
+          MODULE_VERSION_CODE=$(sed -n 's/^val moduleVersionCode = "\(.*\)"$/\1/p' module/build.gradle.kts)
           echo "version=$MODULE_VERSION" >> "$GITHUB_OUTPUT"
           echo "versionCode=$MODULE_VERSION_CODE" >> "$GITHUB_OUTPUT"
 
@@ -66,24 +66,3 @@ jobs:
           name: KsuFrida ${{ steps.module-version.outputs.version }}
           generate_release_notes: true
           files: out/KsuFrida-${{ steps.module-version.outputs.version }}.zip
-
-      - name: Update update.json
-        if: startsWith(github.ref, 'refs/tags/')
-        run: |
-          set -euo pipefail
-
-          VERSION=${{ steps.module-version.outputs.version }}
-          VERSION_CODE=${{ steps.module-version.outputs.versionCode }}
-          REPO="${{ github.repository }}"
-
-          printf '{\n    "version": "%s",\n    "versionCode": %s,\n    "zipUrl": "%s/releases/download/%s/KsuFrida-%s.zip",\n    "changelog": "https://raw.githubusercontent.com/%s/main/changelog.md"\n}\n' \
-            "$VERSION" "$VERSION_CODE" "${{ github.server_url }}/$REPO" "$VERSION" "$VERSION" "$REPO" > update.json
-
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          git add update.json
-          git commit -m "update update.json for ${VERSION}" || exit 0
-
-          git remote set-url origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
-          git push origin HEAD:main

@@ -9,7 +9,7 @@ Both configurations are supported with the advanced config taking precedence in 
 ## Config File
 
 This module is configured via a json config located at `/data/local/tmp/libsec/config.json`.
-A first install writes `{ "targets": [] }` if that file does not already exist. `config.json.example` is the same empty stub — it is not a live demo target.
+A first install writes `{ "targets": [] }` if that file does not already exist.
 
 Prefer adding apps from the KernelSU WebUI. To start from a blank file manually:
 ```shell

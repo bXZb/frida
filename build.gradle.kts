@@ -4,6 +4,3 @@
  * This is a general purpose Gradle build.
  * Learn more about Gradle by exploring our Samples at https://docs.gradle.org/9.8.0/samples
  */
-plugins {
-    alias(libs.plugins.android.library) apply false
-}

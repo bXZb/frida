@@ -57,7 +57,7 @@ Open KernelSU Manager → Modules → KsuFrida → WebUI.
 adb shell su -c 'printf "%s\n" "{ \"targets\": [] }" > /data/local/tmp/libsec/config.json'
 ```
 
-Then add a real package in WebUI, or edit `config.json` (see [advanced config](docs/advanced_config.md)). `config.json.example` is a schema stub with an empty `targets` array — do not treat it as a live target list.
+Then add a real package in WebUI, or edit `config.json` (see [advanced config](docs/advanced_config.md)).
 
 ### Connecting
 

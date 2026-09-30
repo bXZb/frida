@@ -4,15 +4,16 @@ import org.apache.tools.ant.filters.FixCrLfFilter
 import org.apache.tools.ant.filters.ReplaceTokens
 
 plugins {
-    alias(libs.plugins.android.library)
+    id("com.android.library") version "9.4.0"
 }
 
-val magiskModuleId = providers.gradleProperty("magiskModuleId").get()
-val moduleName = providers.gradleProperty("moduleName").get()
-val moduleVersion = providers.gradleProperty("moduleVersion").get()
-val moduleVersionCode = providers.gradleProperty("moduleVersionCode").get()
-val moduleAuthor = providers.gradleProperty("moduleAuthor").get()
-val moduleDescription = providers.gradleProperty("moduleDescription").get()
+// Magisk module metadata (single source of truth; expanded into module.prop)
+val magiskModuleId = "ksufrida"
+val moduleName = "KsuFrida"
+val moduleVersion = "v1.9.32"
+val moduleVersionCode = "42"
+val moduleAuthor = "bXZb"
+val moduleDescription = "Frida gadget injection module for KernelSU via Zygisk"
 
 val outDir = rootProject.layout.projectDirectory.dir("out")
 val webuiDir = rootProject.layout.projectDirectory.dir("webui")
@@ -23,7 +24,7 @@ val npmCommand = if (org.gradle.internal.os.OperatingSystem.current().isWindows)
 val npmInstallWebui = tasks.register<Exec>("npmInstallWebui") {
     workingDir(webuiDir)
     commandLine(npmCommand, "install")
-    onlyIf { !webuiDir.dir("node_modules").asFile.exists() }
+    onlyIf { !it.outputs.files.single().exists() }
     outputs.dir(webuiDir.dir("node_modules"))
 }
 
@@ -74,13 +75,11 @@ android {
 }
 
 dependencies {
-    implementation(libs.rikka.cxx)
-    implementation(libs.dobby)
+    implementation("dev.rikka.ndk.thirdparty:cxx:1.2.0")
+    implementation("io.github.vvb2060.ndk:dobby:1.2")
 }
 
 androidComponents {
-    val adb = sdkComponents.adb
-
     onVariants { variant ->
         val variantCapped = variant.name.replaceFirstChar { it.uppercaseChar() }
         val buildType = variant.buildType
@@ -95,9 +94,6 @@ androidComponents {
             duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
             into(magiskDir)
-            from(rootProject.layout.projectDirectory) {
-                include("config.json.example")
-            }
             from(templateDir) {
                 exclude("module.prop", "customize.sh", "verify.sh")
             }
@@ -157,25 +153,6 @@ androidComponents {
             from(magiskDir)
             archiveFileName.set(zipName)
             destinationDirectory.set(outDir)
-        }
-
-        tasks.register<Exec>("push$variantCapped") {
-            dependsOn("zip$variantCapped")
-            workingDir(outDir)
-            commandLine(adb.get().asFile, "push", zipName, "/data/local/tmp/")
-        }
-
-        tasks.register<Exec>("flash$variantCapped") {
-            dependsOn("push$variantCapped")
-            commandLine(
-                adb.get().asFile, "shell", "su", "-c",
-                "magisk --install-module /data/local/tmp/$zipName",
-            )
-        }
-
-        tasks.register<Exec>("flashAndReboot$variantCapped") {
-            dependsOn("flash$variantCapped")
-            commandLine(adb.get().asFile, "shell", "reboot")
         }
 
         tasks.matching { it.name == "assemble$variantCapped" }.configureEach {

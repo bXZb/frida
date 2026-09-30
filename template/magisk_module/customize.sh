@@ -51,8 +51,6 @@ fi
 ui_print "- Preparing runtime directory (gadget is not bundled)"
 mkdir -p "$TMP_MODULE_DIR"
 
-extract "$ZIPFILE" "config.json.example" "$TMP_MODULE_DIR" true
-
 if [ ! -f "$TMP_MODULE_DIR/config.json" ]; then
   ui_print "- Writing empty target list"
   printf '%s\n' '{ "targets": [] }' > "$TMP_MODULE_DIR/config.json"
